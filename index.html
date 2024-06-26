@@ -1,22 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WebAR with Three.js and AR.js</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.3.5/aframe/build/aframe-ar.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebAR</title>
+  <style>
+    /* Include the CSS code here */
+    .webar {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 200;
+      width: 240px; 
+      height: 240px; 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 20px;
+      background-color: white;
+    }
+
+    .webar button {
+      padding: 0;
+      border: none;
+      width: auto;
+      margin: 0;
+      position: absolute;
+      right: 4px;
+      top: 0px;
+      transform: rotate(45deg);
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .webar button:focus {
+      box-shadow: none;
+    }
+
+    .webar > div {
+      width: 100%;
+      height: 100%;
+    }
+
+    .webar > div > canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    model-viewer {
+      display: none;
+    }
+  </style>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.1.1/model-viewer.min.js"></script>
 </head>
-<body style="margin : 0px; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
-        <!-- Define the marker -->
-        <a-marker preset="hiro">
-            <!-- Add your 3D model here -->
-            <a-entity gltf-model="https://pixel-dev.fra1.digitaloceanspaces.com/users/5/public/3d/1706118144.glb" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"></a-entity>
-        </a-marker>
-        <!-- Add a camera -->
-        <a-entity camera></a-entity>
-    </a-scene>
+<body>
+  <div id="app">
+    <div id="webar-mobile" >
+      <model-viewer id="model-viewer"
+        ar
+        magic-leap
+        ar-status="not-presenting"
+        autoplay
+        bounds="tight"
+        enable-pan
+        environment-image="neutral"
+        shadow-intensity="1"
+        ar-modes="scene-viewer quick-look webxr"
+        quick-look-browsers="safari chrome firefox"
+        scale="0.05 0.05 0.05">
+      </model-viewer>
+    </div>
+  </div>
+  <script>
+    // Include the JavaScript code here
+    document.addEventListener('DOMContentLoaded', function() {
+      const app = {
+        device: null,
+        firstActivate: false,
+        object: {}, // Replace with your object data
+        updateWebxr: false,
+        get sourceUrl() {
+          return this.object?.file?.url || "";
+        },
+        get sourceUrlIos() {
+          return this.object?.file?.urlUsdz || "";
+        },
+        get animationName() {
+          return this.object?.file?.animationName || "";
+        },
+        init() {
+          if (this.device === 'desktop') {
+            document.getElementById('webar-desktop').style.display = 'block';
+          } else {
+            document.getElementById('webar-mobile').style.display = 'block';
+            const modelViewer = document.getElementById('model-viewer');
+            modelViewer.setAttribute('src', this.sourceUrl);
+            modelViewer.setAttribute('ios-src', this.sourceUrlIos);
+            modelViewer.setAttribute('animation-name', this.animationName);
+          }
+        },
+        activatedAR() {
+          const mv = document.getElementById('model-viewer');
+          if (mv && mv.canActivateAR) {
+            if (!this.firstActivate) {
+              this.firstActivate = true;
+              setTimeout(() => {
+                mv.activateAR();
+              }, 240);
+            } else {
+              mv.activateAR();
+            }
+          } else {
+            console.error("current platform doesn't support AR");
+          }
+        },
+      };
+      app.init();
+    });
+    console.log('init')
+  </script>
 </body>
 </html>
