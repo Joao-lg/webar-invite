@@ -81,27 +81,25 @@
         object: {}, // Replace with your object data
         updateWebxr: false,
         get sourceUrl() {
-          return this.object?.file?.url || "";
+          return "https://pixel-dev.fra1.digitaloceanspaces.com/users/5/public/3d/1706118144.glb";
         },
         get sourceUrlIos() {
-          return this.object?.file?.urlUsdz || "";
+          return "https://pixel-dev.fra1.digitaloceanspaces.com/users/5/public/3d/1706118144.glb";
         },
         get animationName() {
           return this.object?.file?.animationName || "";
         },
         init() {
-          if (this.device === 'desktop') {
-            document.getElementById('webar-desktop').style.display = 'block';
-          } else {
             document.getElementById('webar-mobile').style.display = 'block';
             const modelViewer = document.getElementById('model-viewer');
             modelViewer.setAttribute('src', this.sourceUrl);
             modelViewer.setAttribute('ios-src', this.sourceUrlIos);
             modelViewer.setAttribute('animation-name', this.animationName);
-          }
+            this.activatedAR()
         },
         activatedAR() {
           const mv = document.getElementById('model-viewer');
+          console.log(mv, mv.canActivateAR)
           if (mv && mv.canActivateAR) {
             if (!this.firstActivate) {
               this.firstActivate = true;
