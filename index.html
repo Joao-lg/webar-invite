@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebAR</title>
   <style>
-    /* Include the CSS code here */
     .webar {
       position: absolute;
       left: 50%;
@@ -47,10 +46,6 @@
       width: 100% !important;
       height: 100% !important;
     }
-
-    model-viewer {
-      display: none;
-    }
   </style>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.1.1/model-viewer.min.js"></script>
 </head>
@@ -73,7 +68,6 @@
     </div>
   </div>
   <script>
-    // Include the JavaScript code here
     document.addEventListener('DOMContentLoaded', function() {
       const app = {
         device: null,
@@ -90,17 +84,19 @@
           return this.object?.file?.animationName || "";
         },
         init() {
+          this.setDevice();
+          if (this.device !== 'desktop') {
             document.getElementById('webar-mobile').style.display = 'block';
             const modelViewer = document.getElementById('model-viewer');
             modelViewer.setAttribute('src', this.sourceUrl);
             modelViewer.setAttribute('ios-src', this.sourceUrlIos);
             modelViewer.setAttribute('animation-name', this.animationName);
-            this.activatedAR()
+            this.activatedAR();
+          }
         },
         activatedAR() {
           const mv = document.getElementById('model-viewer');
-          console.log(mv, mv.canActivateAR)
-          if (mv && mv.canActivateAR) {
+          if (mv) {
             if (!this.firstActivate) {
               this.firstActivate = true;
               setTimeout(() => {
@@ -113,10 +109,20 @@
             console.error("current platform doesn't support AR");
           }
         },
+        setDevice() {
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          const isAndroid = /Android/.test(navigator.userAgent);
+          if (isIOS) {
+            this.device = 'ios';
+          } else if (isAndroid) {
+            this.device = 'android';
+          } else {
+            this.device = 'desktop';
+          }
+        }
       };
       app.init();
     });
-    console.log('init')
   </script>
 </body>
 </html>
